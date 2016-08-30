@@ -22,7 +22,6 @@ namespace PoGo.NecroBot.Logic.Tasks
     public static class CatchPokemonTask
     {
         public static int AmountOfBerries;
-
         private static Random Random => new Random((int)DateTime.Now.Ticks);
 
         private static bool CatchThresholdExceeds(ISession session)
@@ -44,6 +43,9 @@ namespace PoGo.NecroBot.Logic.Tasks
                     return true;
                 }
             }
+
+            Logger.Write($"(CATCH LIMIT) {session.Stats.PokemonTimestamps.Count}/{session.LogicSettings.CatchPokemonLimit}",
+                LogLevel.Info, ConsoleColor.Yellow);
             return false;
         }
 
@@ -300,8 +302,15 @@ namespace PoGo.NecroBot.Logic.Tasks
                 session.EventDispatcher.Send(evt);
 
                 attemptCounter++;
+
                 if (session.LogicSettings.TransferDuplicatePokemonOnCapture && session.LogicSettings.TransferDuplicatePokemon)
-                    await TransferDuplicatePokemonTask.Execute(session, cancellationToken);
+                {
+                    if (session.LogicSettings.UseNearActionRandom)
+                        await HumanRandomActionTask.TransferRandom(session, cancellationToken);
+                    else
+                        await TransferDuplicatePokemonTask.Execute(session, cancellationToken);
+                }
+
                 DelayingUtils.Delay(session.LogicSettings.DelayBetweenPokemonCatch, 0);
             } while (caughtPokemonResponse.Status == CatchPokemonResponse.Types.CatchStatus.CatchMissed ||
                      caughtPokemonResponse.Status == CatchPokemonResponse.Types.CatchStatus.CatchEscape);

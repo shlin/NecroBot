@@ -20,7 +20,7 @@ namespace PoGo.NecroBot.Logic.Strategies.Walk
             _client = client;
         }
 
-        public async Task<PlayerUpdateResponse> Walk(GeoCoordinate targetLocation, Func<Task<bool>> functionExecutedWhileWalking, ISession session, CancellationToken cancellationToken)
+        public async Task<PlayerUpdateResponse> Walk(GeoCoordinate targetLocation, Func<Task<bool>> functionExecutedWhileWalking, ISession session, CancellationToken cancellationToken, double walkSpeed = 0.0)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -41,7 +41,7 @@ namespace PoGo.NecroBot.Logic.Strategies.Walk
             var requestSendDateTime = DateTime.Now;
             var requestVariantDateTime = DateTime.Now;
 
-            var result = await _client.Player.UpdatePlayerLocation(waypoint.Latitude, waypoint.Longitude, waypoint.Altitude);
+            var result = await LocationUtils.UpdatePlayerLocationWithAltitude(session, waypoint);
 
             double SpeedVariantSec = rw.Next(1000, 10000);
             UpdatePositionEvent?.Invoke(waypoint.Latitude, waypoint.Longitude);
@@ -78,7 +78,7 @@ namespace PoGo.NecroBot.Logic.Strategies.Walk
                 waypoint = LocationUtils.CreateWaypoint(sourceLocation, nextWaypointDistance, nextWaypointBearing);
 
                 requestSendDateTime = DateTime.Now;
-                result = await _client.Player.UpdatePlayerLocation(waypoint.Latitude, waypoint.Longitude, waypoint.Altitude);
+                result = await LocationUtils.UpdatePlayerLocationWithAltitude(session, waypoint);
 
                 UpdatePositionEvent?.Invoke(waypoint.Latitude, waypoint.Longitude);
 
