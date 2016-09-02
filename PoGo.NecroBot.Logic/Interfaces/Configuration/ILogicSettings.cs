@@ -122,7 +122,6 @@ namespace PoGo.NecroBot.Logic.Interfaces.Configuration
         bool SnipePokemonNotInPokedex { get; }
         bool RandomizeRecycle { get; }
         int RandomRecycleValue { get; }
-        bool DelayBetweenRecycleActions { get; }
         int TotalAmountOfPokeballsToKeep { get; }
         int TotalAmountOfPotionsToKeep { get; }
         int TotalAmountOfRevivesToKeep { get; }
@@ -135,6 +134,10 @@ namespace PoGo.NecroBot.Logic.Interfaces.Configuration
         bool UsePokeStopLimit { get; }
         bool UseCatchLimit { get; }
         bool UseNearActionRandom { get; }
+        bool AutoCompleteTutorial { get; }
+        string DesiredNickname { get; }
+        string DesiredGender { get; }
+        string DesiredStarter { get; }
         ICollection<KeyValuePair<ItemId, int>> ItemRecycleFilter { get; }
 
         ICollection<PokemonId> PokemonsToEvolve { get; }
@@ -180,6 +183,11 @@ namespace PoGo.NecroBot.Logic.Interfaces.Configuration
         bool HumanWalkingSnipeUseSnipePokemonList { get; }
         Dictionary<PokemonId, HumanWalkSnipeFilter> HumanWalkSnipeFilters { get; }
         double HumanWalkingSnipeMaxSpeedUpSpeed { get; }
+        int HumanWalkingSnipeDelayTimeAtDestination { get; }
         bool HumanWalkingSnipeAllowSpeedUp { get; }
+        int EvolveActionDelay { get; }
+        int TransferActionDelay { get; }
+        int RecycleActionDelay { get; }
+        int RenamePokemonActionDelay { get; }
     }
 }

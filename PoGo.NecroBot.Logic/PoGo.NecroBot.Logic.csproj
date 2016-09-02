@@ -141,6 +141,7 @@
     <Compile Include="Event\InventoryListEvent.cs" />
     <Compile Include="Event\ItemRecycledEvent.cs" />
     <Compile Include="Event\KillSwitchEvent.cs" />
+    <Compile Include="Event\LogEvent.cs" />
     <Compile Include="Event\NoPokeballEvent.cs" />
     <Compile Include="Event\SnipeEvent.cs" />
     <Compile Include="Event\SnipeModeEvent.cs" />
@@ -217,6 +218,7 @@
     <Compile Include="Service\TelegramService.cs" />
     <Compile Include="Model\Settings\LogicSettings.cs" />
     <Compile Include="Service\YoursDirectionsService.cs" />
+    <Compile Include="State\CheckTosState.cs" />
     <Compile Include="State\SessionStats.cs" />
     <Compile Include="Strategies\Walk\BaseWalkStrategy.cs" />
     <Compile Include="Strategies\Walk\FlyStrategy.cs" />
@@ -231,6 +233,21 @@
     <Compile Include="Tasks\GetPokeDexCount.cs" />
     <Compile Include="Tasks\HumanRandomActionTask.cs" />
     <Compile Include="Tasks\HumanWalkSnipeTask.cs" />
+    <Compile Include="Tasks\HumanWalkSnipeTask.Pokecrew.cs">
+      <DependentUpon>HumanWalkSnipeTask.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tasks\HumanWalkSnipeTask.Pokeradar.cs">
+      <DependentUpon>HumanWalkSnipeTask.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tasks\HumanWalkSnipeTask.Pokesnipers.cs">
+      <DependentUpon>HumanWalkSnipeTask.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tasks\HumanWalkSnipeTask.PokeZZ.cs">
+      <DependentUpon>HumanWalkSnipeTask.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Tasks\HumanWalkSnipeTask.Skiplagged.cs">
+      <DependentUpon>HumanWalkSnipeTask.cs</DependentUpon>
+    </Compile>
     <Compile Include="Tasks\InventoryListTask.cs" />
     <Compile Include="Tasks\LevelUpPokemonTask.cs" />
     <Compile Include="Tasks\PokemonListTask.cs" />
