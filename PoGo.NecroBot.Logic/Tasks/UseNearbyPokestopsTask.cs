@@ -81,8 +81,8 @@ namespace PoGo.NecroBot.Logic.Tasks
                 pokestopList =
                     pokestopList.OrderBy(
                         i =>
-                            LocationUtils.CalculateDistanceInMeters(session.Client.CurrentLatitude,
-                                session.Client.CurrentLongitude, i.Latitude, i.Longitude)).ToList();
+                            session.Navigation.WalkStrategy.CalculateDistance(
+                                session.Client.CurrentLatitude, session.Client.CurrentLongitude, i.Latitude, i.Longitude, session)).ToList();
 
                 // randomize next pokestop between first and second by distance
                 var pokestopListNum = 0;
@@ -159,7 +159,7 @@ namespace PoGo.NecroBot.Logic.Tasks
                                     pokestopList.Remove(ps);
                                 var fi = await session.Client.Fort.GetFort(ps.Id, ps.Latitude, ps.Longitude);
                                 await FarmPokestop(session, ps, fi, cancellationToken, true);
-                                await Task.Delay(1000);
+                                await Task.Delay(2000);
                             }
                         },
                         async () =>
@@ -285,8 +285,6 @@ namespace PoGo.NecroBot.Logic.Tasks
                         await TransferWeakPokemonTask.Execute(session, cancellationToken);
                     if (session.LogicSettings.RenamePokemon)
                         await RenamePokemonTask.Execute(session, cancellationToken);
-                    if (session.LogicSettings.AutoFavoritePokemon)
-                        await FavoritePokemonTask.Execute(session, cancellationToken);
                     if (session.LogicSettings.AutomaticallyLevelUpPokemon)
                         await LevelUpPokemonTask.Execute(session, cancellationToken);
 
@@ -385,7 +383,7 @@ namespace PoGo.NecroBot.Logic.Tasks
             } while (fortTry < retryNumber - zeroCheck);
             //Stop trying if softban is cleaned earlier or if 40 times fort looting failed.
 
-            if (session.LogicSettings.RandomlyPauseAtStops)
+            if (session.LogicSettings.RandomlyPauseAtStops && !doNotRetry)
             {
                 if (++RandomStop >= RandomNumber)
                 {

@@ -19,6 +19,7 @@ namespace PoGo.NecroBot.Logic.Strategies.Walk
 
         public GoogleStrategy(Client client) : base(client)
         {
+            _googleDirectionsService = null;
         }
 
         public override async Task<PlayerUpdateResponse> Walk(GeoCoordinate targetLocation, Func<Task<bool>> functionExecutedWhileWalking, ISession session, CancellationToken cancellationToken, double walkSpeed = 0.0)
@@ -29,7 +30,7 @@ namespace PoGo.NecroBot.Logic.Strategies.Walk
             var currentLocation = new GeoCoordinate(_client.CurrentLatitude, _client.CurrentLongitude, _client.CurrentAltitude);
             var googleResult = _googleDirectionsService.GetDirections(currentLocation, new List<GeoCoordinate>(), targetLocation);
 
-            if (googleResult.Directions.status.Equals("OVER_QUERY_LIMIT"))
+            if (googleResult == null || googleResult.Directions.status.Equals("OVER_QUERY_LIMIT"))
             {
                 return await RedirectToNextFallbackStrategy(session.LogicSettings, targetLocation, functionExecutedWhileWalking, session, cancellationToken);
             }
@@ -45,11 +46,46 @@ namespace PoGo.NecroBot.Logic.Strategies.Walk
             if (_googleDirectionsService == null)
                 _googleDirectionsService = new GoogleDirectionsService(session);
         }
-        public async Task<double> CalculateDistance(double sourceLat, double sourceLng, double destinationLat, double destinationLng)
-        {
-            //need to implement API call to calculate real distance, that will impact on perfomance.
 
-            return 1.5 * LocationUtils.CalculateDistanceInMeters(sourceLat, sourceLng, destinationLat, destinationLng);
+        public override double CalculateDistance(double sourceLat, double sourceLng, double destinationLat, double destinationLng, ISession session = null)
+        {
+            if (session != null)
+                GetGoogleInstance(session);
+
+            //Check Google direction service is initialized
+            if (_googleDirectionsService != null)
+            {
+                var googleResult = _googleDirectionsService.GetDirections(new GeoCoordinate(sourceLat, sourceLng), new List<GeoCoordinate>(), new GeoCoordinate(destinationLat, destinationLng));
+                if (googleResult == null || googleResult.Directions.status.Equals("OVER_QUERY_LIMIT"))
+                {
+                    return 1.5 * base.CalculateDistance(sourceLat, sourceLng, destinationLat, destinationLng);
+                }
+                else
+                {
+                    //There are two ways to get distance value. One is counting from waypoint list.
+                    //The other is getting from google service. The result value is different.
+
+                    ////Count distance from waypoint list
+                    //var googleWalk = GoogleWalk.Get(googleResult);
+                    //List<GeoCoordinate> points = googleWalk.Waypoints;
+                    //double distance = 0;
+                    //for (var i = 0; i < points.Count; i++)
+                    //{
+                    //    if (i > 0)
+                    //    {
+                    //        distance += LocationUtils.CalculateDistanceInMeters(points[i - 1], points[i]);
+                    //    }
+                    //}
+                    //return distance;
+
+                    //Get distance from Google service
+                    return googleResult.GetDistance();
+                }
+            }
+            else
+            {
+                return 1.5 * base.CalculateDistance(sourceLat, sourceLng, destinationLat, destinationLng);
+            }
         }
     }
 }
